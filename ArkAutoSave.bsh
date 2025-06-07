@@ -11,6 +11,12 @@
 #   Email: mcbriggie@gmail.com                                                                              #
 #   GitHub: https://github.com/McBriggie/ArkAutoSave                                                        #
 #                                                                                                           #
+#   ------------------------------------------------------------------------------------------------------  #
+#                                                                                                           #
+#   Usage                                                                                                   #
+#       Call Manually: bash ArkAutoSave.bsh                                                                 #
+#       Via Cron: * * * * *  bash ArkAutoSave.bsh                                                           #
+#                                                                                                           #
 #############################################################################################################
 
 
