@@ -1,0 +1,57 @@
+#!/bin/bash
+#############################################################################################################
+#                                                                                                           #
+#    █████  ██████  ██   ██      █████  ██    ██ ████████  ██████        ███████  █████  ██    ██ ███████   #
+#   ██   ██ ██   ██ ██  ██      ██   ██ ██    ██    ██    ██    ██       ██      ██   ██ ██    ██ ██        #
+#   ███████ ██████  █████       ███████ ██    ██    ██    ██    ██ █████ ███████ ███████ ██    ██ █████     #
+#   ██   ██ ██   ██ ██  ██      ██   ██ ██    ██    ██    ██    ██            ██ ██   ██  ██  ██  ██        #
+#   ██   ██ ██   ██ ██   ██     ██   ██  ██████     ██     ██████        ███████ ██   ██   ████   ███████   #
+#                                                                                                           #
+#   Written By: McBriggie                                                                                   #
+#   Email: mcbriggie@gmail.com                                                                              #
+#   GitHub: https://github.com/McBriggie/ArkAutoSave                                                        #
+#                                                                                                           #
+#############################################################################################################
+
+
+# Define paths
+v_SAVE_PATH="/var/arkserver/serverfiles/ShooterGame/Saved/TheIsland"
+v_BACKUP_PATH="/var/arkserver/backups"
+v_HISTORY_FILE="/var/arkserver/history.csv"
+v_TIME_STAMP=$(date +%Y%m%d_%H%M%S)
+
+# Create backup directory if it doesn't exist
+mkdir -p "${v_BACKUP_PATH}"
+
+# Create CSV with headers if it doesn't exist
+if [[ ! -f "${v_HISTORY_FILE}" ]]; then
+    echo "Filename,Epoch Time" > "${v_HISTORY_FILE}"
+fi
+
+# Read existing CSV into an associative array
+declare -A v_FILE_HISTORY
+while IFS=, read -r v_FNAME ftime; do
+    v_FILE_HISTORY["${v_FNAME}"]="$ftime"
+done < <(tail -n +2 "${v_HISTORY_FILE}")
+
+# Process each file in the save directory
+for v_FILE_PATH in "${v_SAVE_PATH}"/*; do
+    [[ -f "${v_FILE_PATH}" ]] || continue  # Skip non-files
+    v_FILE_NAME=$(basename "$v_FILE_PATH")
+    v_CURRENT_TIME=$(stat -c %Y "$v_FILE_PATH")
+    v_STORED_TIME=${v_FILE_HISTORY["$v_FILE_NAME"]}
+
+    # Copy if not in history or newer
+    if [[ -z "${v_STORED_TIME}" || "${v_CURRENT_TIME}" -gt "${v_STORED_TIME}" ]]; then
+        cp "${v_FILE_PATH}" "${v_BACKUP_PATH}/${v_FILE_NAME}_${v_TIME_STAMP}"
+        v_FILE_HISTORY["${v_FILE_NAME}"]="${v_CURRENT_TIME}"
+    fi
+done
+
+# Write updated history back to CSV
+{
+    echo "Filename,Epoch Time"
+    for v_FNAME in "${!v_FILE_HISTORY[@]}"; do
+        echo "$v_FNAME,${v_FILE_HISTORY[$v_FNAME]}"
+    done
+} > "${v_HISTORY_FILE}"
