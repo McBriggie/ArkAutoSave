@@ -14,17 +14,18 @@
 #   ------------------------------------------------------------------------------------------------------  #
 #                                                                                                           #
 #   Usage                                                                                                   #
-#       Call Manually: bash ArkAutoSave.bsh                                                                 #
-#       Via Cron: * * * * *  bash ArkAutoSave.bsh                                                           #
+#       Call Manually: bash /path/to/ArkAutoSave.bsh                                                        #
+#       Via Cron: * * * * *  /bin/bash /path/to/ArkAutoSave.bsh                                             #
 #                                                                                                           #
 #############################################################################################################
 
+# User Settings - Change this section ONLY
+v_SAVE_PATH="/path/to/cluster/saves"
+v_BACKUP_PATH="/path/to/backup"
+v_HISTORY_FILE="${v_BACKUP_PATH}/history.csv"
 
-# Define paths
-v_SAVE_PATH="/var/arkserver/serverfiles/ShooterGame/Saved/TheIsland"
-v_BACKUP_PATH="/var/arkserver/backups"
-v_HISTORY_FILE="/var/arkserver/history.csv"
-v_TIME_STAMP=$(date +%Y%m%d_%H%M%S)
+# Preset Variables
+v_TIME_STAMP=$(date +%Y%m%d_%H%M%S)ll 
 
 # Create backup directory if it doesn't exist
 mkdir -p "${v_BACKUP_PATH}"
